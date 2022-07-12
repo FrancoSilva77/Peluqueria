@@ -2,6 +2,7 @@
 
 namespace Controllers;
 
+use Model\Usuario;
 use MVC\Router;
 
 class LoginController
@@ -28,6 +29,19 @@ class LoginController
 
   public static function crear(Router $router)
   {
-    $router->render('auth/crear-cuenta', []);
+    $usuario = new Usuario($_POST);
+
+    // Alertas vacias
+    $alertas = [];
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+      $usuario->sincronizar();
+      $alertas = $usuario->ValidarNuevaCuenta();
+    }
+
+    $router->render('auth/crear-cuenta', [
+      'usuario' => $usuario,
+      'alertas' => $alertas
+    ]);
   }
 }
