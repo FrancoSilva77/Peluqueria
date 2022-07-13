@@ -31,6 +31,7 @@ class Usuario extends ActiveRecord
     $this->token = $args['token'] ?? '';
   }
 
+
   // Mensajes de validación para la creacion de una cuenta
   public function validarNuevaCuenta()
   {
@@ -52,6 +53,19 @@ class Usuario extends ActiveRecord
 
     if (strlen($this->password) < 6) {
       self::$alertas['error'][] = 'El password debe contenener al menos 6 caracteres';
+    }
+
+    return self::$alertas;
+  }
+
+  public function validarLogin()
+  {
+    if (!$this->email) {
+      self::$alertas['error'][] = 'El email es obligatorio';
+    }
+
+    if (!$this->password) {
+      self::$alertas['error'][] = 'La contraseña es obligatoria';
     }
 
     return self::$alertas;
@@ -79,5 +93,16 @@ class Usuario extends ActiveRecord
   public function crearToken()
   {
     $this->token = uniqid();
+  }
+
+  public function comprobarPasswordAndVerificado($password)
+  {
+    $resultado = password_verify($password, $this->password);
+
+    if (!$resultado || !$this->confirmado) {
+      self::$alertas['error'][] = 'Contraseña incorrecta o tu cuenta no ha sido confirmada';
+    } else {
+      return true;
+    }
   }
 }
